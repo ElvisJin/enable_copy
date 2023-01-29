@@ -2,6 +2,9 @@
 
 require('./vendor/autoload.php');
 
+use Firebase\JWT\JWT;
+use Firebase\JWT\Key;
+
 $slapi = null;
 
 class JWTPayload {
@@ -84,10 +87,9 @@ class ShortLetsAPI {
   public function call($jwt_payload) {
     // log
     // $jwt = new JOSE_JWT($jwt_payload->claims);
-    $jwt = new JOSE_JWT();
-    $jwt->header = $jwt_payload->headers;
-    // $jwt->header['kid'] = $jwt_payload->headers['kid']; // set key id
-    $jwt_content = $jwt->encode($jwt_payload->claims)->sign($this->my_private_key, 'ES256')->toString();
+    $jwt_content = JWT::encode(
+      $jwt_payload->claims, $this->my_private_key, 'ES256', $jwt_payload->headers['kid'], $jwt_payload->headers
+    );
     // log
     $http_headers = [
       'X-KeyID' => $this->key_id,
@@ -118,8 +120,10 @@ class ShortLetsAPI {
       $jwt_response = $response->text;
       // log
       try {
-        $jws = $jwt->decode($jwt_response)->verify($this->others_public_key, 'EC256');
-        // $jwt_payload = JWTPayload::from_string($jwt_response);
+        $jwt_response_object = JWT::decode(
+          $jwt_response, $this->others_public_key, 'EC256'
+        );
+        $jwt_payload = JWTPayload::from_string($jwt_response);
         return [$jwt_response_object->rpc->result, $jwt_payload];
       } 
       catch (exception $ex) {
