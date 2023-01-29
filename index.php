@@ -53,14 +53,17 @@ class ShortLetsAPI {
     $this->others_public_key = $settings['others_public_key'];
   }
 
-  public function api_operation_payload($methods, $params) {
-    $dt = new Datetime();
-    $now = $dt->getTimestamp();
-    $rpc_id = $dt->getTimestamp() * 1000;
+  public function api_operation_payload($method, $params) {
+    $now = time();
+    $rpc_id = microtime(true) * 100000;
+
+    // for debug
+    $now = 1675011709;
+    $rpc_id = 167501170986717;
 
     $rpc = [
       'id' => $rpc_id,
-      'methods' => $methods,
+      'methods' => $method,
       'params' => $params
     ];
     $jwt_headers = [
@@ -72,7 +75,7 @@ class ShortLetsAPI {
       'iss' => $this->client_id,
       'aud' => 'klevio-api/v1',
       'iat'=> $now,
-      'jti'=> 'jti-' . (new DateTime())->format('Y-m-d'),
+      'jti'=> 'jti-' . $now,
       'exp' => $now + 5,
       'rpc' => $rpc
     ];
@@ -85,26 +88,29 @@ class ShortLetsAPI {
   }
 
   public function call($jwt_payload) {
-    // log
-    // $jwt = new JOSE_JWT($jwt_payload->claims);
+    var_dump($jwt_payload->claims);
     $jwt_content = JWT::encode(
       $jwt_payload->claims, $this->my_private_key, 'ES256', $jwt_payload->headers['kid'], $jwt_payload->headers
     );
-    // log
     $http_headers = [
       'X-KeyID' => $this->key_id,
       'Content-Type' => 'application/jwt'
     ];
 
     try {
-      // log
+      echo '<br>endpoint<br>';
+      var_dump($this->endpoint);
+      echo '<br>headers<br>';
+      var_dump($http_headers);
+      echo '<br>content<br>';
+      var_dump($jwt_content);
       $ch = curl_init($this->endpoint);
       curl_setopt($ch, CURLOPT_HEADER, $http_headers);
       curl_setopt($ch, CURLOPT_POSTFIELDS, $jwt_content);
 
       $response = json_decode(curl_exec($ch), true);
       curl_close($ch);
-      // log - 
+
       echo 'response from request<br>';
       var_dump($response);
     } 
@@ -175,8 +181,8 @@ class ShortLetsAPI {
     
     if (isset($slapi) && $slapi)
       return $slapi->call($slapi->api_operation_payload('grantKey', [
-        'source' => ['type' => 'property', 'id' => $property_id],
-        'user' => ['type' => 'user', 'email' => $email],
+        'source' => ['$type' => 'property', 'id' => $property_id],
+        'user' => ['$type' => 'user', 'email' => $email],
         'validity' => $validity
       ]));
     return null;
@@ -202,7 +208,7 @@ XCV2mfyFtrwlexnf3+kWPmY6dQDPWBT+G5oeVWfCIstmuGJEZGN2cSXDAw==
 
     $email = 'family@romahi.com';
     $checkin = '2023-06-04T16:00:00Z';
-    $checkout = '2023-06-08t10:30:00Z';
+    $checkout = '2023-06-08T10:30:00Z';
 
     $ret1 = $slapi->grant_key('MainGateCedarHollow', $email, $checkin, $checkout);
 
