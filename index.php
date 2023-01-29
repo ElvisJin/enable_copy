@@ -57,10 +57,6 @@ class ShortLetsAPI {
     $now = time();
     $rpc_id = microtime(true) * 100000;
 
-    // for debug
-    $now = 1675011709;
-    $rpc_id = 167501170986717;
-
     $rpc = [
       'id' => $rpc_id,
       'methods' => $method,
@@ -88,34 +84,33 @@ class ShortLetsAPI {
   }
 
   public function call($jwt_payload) {
-    var_dump($jwt_payload->claims);
     $jwt_content = JWT::encode(
-      $jwt_payload->claims, $this->my_private_key, 'ES256', $jwt_payload->headers['kid'], $jwt_payload->headers
+      $jwt_payload->claims, $this->my_private_key, 'ES256', null, $jwt_payload->headers
     );
-    $http_headers = [
-      'X-KeyID' => $this->key_id,
-      'Content-Type' => 'application/jwt'
-    ];
+    var_dump($jwt_content);
 
     try {
-      echo '<br>endpoint<br>';
-      var_dump($this->endpoint);
-      echo '<br>headers<br>';
-      var_dump($http_headers);
-      echo '<br>content<br>';
-      var_dump($jwt_content);
-      $ch = curl_init($this->endpoint);
-      curl_setopt($ch, CURLOPT_HEADER, $http_headers);
-      curl_setopt($ch, CURLOPT_POSTFIELDS, $jwt_content);
+      $context = stream_context_create(['http' => [
+        'header' => [
+          'Content-type' => 'application/jwt',
+          'X-KeyID' => $this->key_id,
+        ],
+        'method' => 'POST',
+        'content' => $jwt_content
+      ]]);
+      $response = file_get_contents($this->endpoint,  false, $context);
+      // curl_setopt($ch, CURLOPT_POST, 1); // set post data count ...
 
-      $response = json_decode(curl_exec($ch), true);
-      curl_close($ch);
-
-      echo 'response from request<br>';
-      var_dump($response);
+      echo '<br>response<br>';
+      echo $response;
+      // var_dump($response);
     } 
     catch (exception $ex) {
       // log
+      echo 'exception<br>';
+      var_dump($ex);
+      echo '<br>';
+
       return [
         'error' => true,
         'message' => 'Upstream error1'
@@ -192,6 +187,7 @@ class ShortLetsAPI {
     global $slapi;
 
     $slapi = new ShortLetsAPI([
+      // 'endpoint' => 'http://localhost/enable_copy/response.php',
       'endpoint' => 'https://api.klevio.com/s1/v1/rpc',
       'external_id' => 'P1C32FV59XR8DK9MFX74M50PZ9MEAZ329NTJGE3HMA',
       'client_id' => 'C4FVY1FMYWW60K05F8NS91A2JDFAPA',
