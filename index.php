@@ -190,14 +190,14 @@ class ShortLetsAPI {
       'external_id' => 'P1C32FV59XR8DK9MFX74M50PZ9MEAZ329NTJGE3HMA',
       'client_id' => 'C4FVY1FMYWW60K05F8NS91A2JDFAPA',
       'my_private_key' => '-----BEGIN EC PRIVATE KEY-----
-      MHcCAQEEICiySHKRnum6j4bqCnB2EPRoqEFMY6C96qucfMfiw+8loAoGCCqGSM49
-      AwEHoUQDQgAEh4zrdxjdHYESXePAJJGkQ4yJXsJyftVFn0Y45MsPEM+y38S8be6j
-      +eDNXRB9VQGvuX3ONopgxsBTGXaicOmciQ==
-      -----END EC PRIVATE KEY-----',
+MHcCAQEEICiySHKRnum6j4bqCnB2EPRoqEFMY6C96qucfMfiw+8loAoGCCqGSM49
+AwEHoUQDQgAEh4zrdxjdHYESXePAJJGkQ4yJXsJyftVFn0Y45MsPEM+y38S8be6j
++eDNXRB9VQGvuX3ONopgxsBTGXaicOmciQ==
+-----END EC PRIVATE KEY-----',
       'others_public_key' => '-----BEGIN PUBLIC KEY-----
-      MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEq5YAUxJ8BePUBVrxEhXJkFwGNuxM
-      XCV2mfyFtrwlexnf3+kWPmY6dQDPWBT+G5oeVWfCIstmuGJEZGN2cSXDAw==
-      -----END PUBLIC KEY-----'
+MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEq5YAUxJ8BePUBVrxEhXJkFwGNuxM
+XCV2mfyFtrwlexnf3+kWPmY6dQDPWBT+G5oeVWfCIstmuGJEZGN2cSXDAw==
+-----END PUBLIC KEY-----'
     ]);
 
     $email = 'family@romahi.com';
