@@ -90,19 +90,39 @@ class ShortLetsAPI {
     var_dump($jwt_content);
 
     try {
-      $context = stream_context_create(['http' => [
-        'header' => [
-          'Content-type' => 'application/jwt',
-          'X-KeyID' => $this->key_id,
-        ],
-        'method' => 'POST',
-        'content' => $jwt_content
-      ]]);
-      $response = file_get_contents($this->endpoint,  false, $context);
+      // $request = new HTTPRequest($url, HTTP_METHOD_POST);
+      // $context = stream_context_create(['http' => [
+      //   'header' => [
+      //     'Content-type' => 'application/jwt',
+      //     'X-KeyID' => $this->key_id,
+      //   ],
+      //   'method' => 'POST',
+      //   'content' => $jwt_content
+      // ]]);
+      // $response = file_get_contents($this->endpoint, false, $context);
       // curl_setopt($ch, CURLOPT_POST, 1); // set post data count ...
+      $header_options = array(
+        'Content-type' => 'application/x-www-form-urlencoded; charset=UTF-8',
+        'Authorization' => 'Bearer' . $jwt_content,
+      );
+      if($ch = curl_init($this->endpoint))
+      {
+         curl_setopt($ch, CURLOPT_POST, 1);
+         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+         curl_setopt($ch, CURLOPT_HEADER, 0);
+         curl_setopt($ch, CURLOPT_HTTPHEADER, $header_options);
+        //  curl_setopt($ch, CURLOPT_POSTFIELDS, $fields);
+        $response = curl_exec($ch);
+
+        //  $status = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+   
+         curl_close($ch);
+   
+      }
 
       echo '<br>response<br>';
       echo $response;
+      echo '<br>response end<br>';
       // var_dump($response);
     } 
     catch (exception $ex) {
